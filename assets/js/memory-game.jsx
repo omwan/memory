@@ -10,17 +10,31 @@ class Memory extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            grid: this.buildGrid()
+            grid: this.buildGrid(),
+            numFlipped: 0,
         };
     }
 
+    //generate a list of memory card values in random order
+    getValues() {
+        let values = [];
+        for (let i = 0; i < 16; i++) {
+            let val = ((i % 8) + 10).toString(36);
+            values.push(val);
+        }
+        return _.shuffle(values);
+    }
+
+    //build grid with a random order of cards
     buildGrid() {
+        let values = this.getValues();
+
         let grid = [];
         for (let i = 0; i < 4; i++) {
             let row = [];
             for (let j = 0; j < 4; j++) {
                 row.push({
-                    value: "A",
+                    value: values[i * 4 + j],
                     flipped: false
                 });
             }
@@ -29,6 +43,7 @@ class Memory extends React.Component {
         return grid;
     }
 
+    //flip a card
     flipCard(index) {
         let row = index[0];
         let col = index[1];
@@ -39,6 +54,7 @@ class Memory extends React.Component {
             value: card.value,
             flipped: !card.flipped
         };
+
         this.setState({grid: newGrid});
     }
 
