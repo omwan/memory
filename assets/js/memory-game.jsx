@@ -37,7 +37,8 @@ class Memory extends React.Component {
             for (let j = 0; j < 4; j++) {
                 row.push({
                     value: values[i * 4 + j],
-                    flipped: false
+                    flipped: false,
+                    removed: false
                 });
             }
             grid.push(row);
@@ -51,7 +52,7 @@ class Memory extends React.Component {
         let col = index[1];
         let card = this.state.grid[row][col];
 
-        if (this.state.numFlipped < 2 && !card.flipped) {
+        if (this.state.numFlipped < 2 && !card.flipped && !card.removed) {
             let newGrid = this.state.grid.slice();
             newGrid[row][col] = {
                 value: card.value,
@@ -85,10 +86,17 @@ class Memory extends React.Component {
             for (let j = 0; j < 4; j++) {
                 let card = newGrid[i][j];
                 if (card.flipped) {
-                    newGrid[i][j] = {
+                    let newCard = {
                         value: card.value,
-                        flipped: false
+                        flipped: false,
+                        removed: false
+                    };
+
+                    if (this.state.currentCards[0].value === this.state.currentCards[1].value) {
+                        newCard["removed"] = true;
                     }
+
+                    newGrid[i][j] = newCard;
                 }
             }
         }
@@ -129,9 +137,13 @@ function CardItem(props) {
         display = card.value;
     }
 
-    return <div className="column card" onClick={() => {
-        props.flipCard(props.index)
-    }}>
-        {display}
-    </div>;
+    if (!card.removed) {
+        return <div className="column card" onClick={() => {
+            props.flipCard(props.index)
+        }}>
+            {display}
+        </div>;
+    } else {
+        return <div className="column card removed"></div>;
+    }
 }
