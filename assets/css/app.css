@@ -1,5 +1,4 @@
 /* This file is for your main application css. */
-
 @import "~milligram/dist/milligram";
 
 .column > p {
@@ -7,3 +6,10 @@
     text-align: center;
 }
 
+.card {
+    line-height: 150px;
+    height: 150px;
+    background: #ccc;
+    text-align: center;
+    margin: 20px;
+}
