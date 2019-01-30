@@ -12,7 +12,6 @@ class Memory extends React.Component {
         this.state = {
             grid: this.buildGrid(),
             numFlipped: 0,
-            viewed: {},
             currentCards: [],
             score: 0,
             clicks: 0
@@ -56,20 +55,18 @@ class Memory extends React.Component {
 
         if (this.state.numFlipped < 2 && !card.flipped && !card.removed) {
             let newGrid = this.state.grid.slice();
-            newGrid[row][col] = {
-                value: card.value,
-                flipped: true
-            };
+            let newCard = _.assign({}, card);
+            newCard.flipped = true;
+            newGrid[row][col] = newCard;
 
             let currentCards = this.state.currentCards.slice();
             currentCards.push(card);
 
             let numFlipped = this.state.numFlipped + 1;
-            numFlipped += 1;
 
             this.setState({
                 grid: newGrid,
-                numFlipped: this.state.numFlipped + 1,
+                numFlipped: numFlipped,
                 currentCards: currentCards,
                 clicks: this.state.clicks + 1
             });
@@ -90,14 +87,11 @@ class Memory extends React.Component {
             for (let j = 0; j < 4; j++) {
                 let card = newGrid[i][j];
                 if (card.flipped) {
-                    let newCard = {
-                        value: card.value,
-                        flipped: false,
-                        removed: false
-                    };
+                    let newCard = _.assign({}, card);
+                    newCard.flipped = false;
 
                     if (this.state.currentCards[0].value === this.state.currentCards[1].value) {
-                        newCard["removed"] = true;
+                        newCard.removed = true;
                         matchFound = true;
                     }
 
@@ -132,7 +126,6 @@ class Memory extends React.Component {
         this.setState({
             grid: this.buildGrid(),
             numFlipped: 0,
-            viewed: {},
             currentCards: [],
             score: 0,
             clicks: 0
