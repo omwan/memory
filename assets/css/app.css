@@ -2,7 +2,7 @@
 @import "~milligram/dist/milligram";
 
 .column > p {
-    padding-top: 10ex;
+    padding-top: 20px;
     text-align: center;
 }
 
@@ -17,5 +17,5 @@
 }
 
 .removed {
-    background:none;
+    background: none;
 }

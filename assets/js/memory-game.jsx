@@ -13,7 +13,9 @@ class Memory extends React.Component {
             grid: this.buildGrid(),
             numFlipped: 0,
             viewed: {},
-            currentCards: []
+            currentCards: [],
+            score: 0,
+            clicks: 0
         };
     }
 
@@ -62,13 +64,14 @@ class Memory extends React.Component {
             let currentCards = this.state.currentCards.slice();
             currentCards.push(card);
 
-            let numFlipped = this.state.numFlipped;
+            let numFlipped = this.state.numFlipped + 1;
             numFlipped += 1;
 
             this.setState({
                 grid: newGrid,
-                numFlipped: numFlipped,
-                currentCards: currentCards
+                numFlipped: this.state.numFlipped + 1,
+                currentCards: currentCards,
+                clicks: this.state.clicks + 1
             });
 
             if (numFlipped === 2) {
@@ -82,6 +85,7 @@ class Memory extends React.Component {
     //hide all cards
     resetFlips() {
         let newGrid = this.state.grid.slice();
+        let matchFound = false;
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 4; j++) {
                 let card = newGrid[i][j];
@@ -94,24 +98,70 @@ class Memory extends React.Component {
 
                     if (this.state.currentCards[0].value === this.state.currentCards[1].value) {
                         newCard["removed"] = true;
+                        matchFound = true;
                     }
 
                     newGrid[i][j] = newCard;
                 }
             }
         }
-        this.setState({grid: newGrid, numFlipped: 0, currentCards: []});
+
+        this.setState({
+            grid: newGrid,
+            numFlipped: 0,
+            currentCards: [],
+            score: this.updateScore(matchFound),
+        });
+    }
+
+    //generate new score based on current board
+    updateScore(matchFound) {
+        let newScore = this.state.score;
+        if (matchFound) {
+            newScore += 10;
+        } else {
+            if (newScore > 0) {
+                newScore -= 1;
+            }
+        }
+        return newScore;
+    }
+
+    //restart game, resetting state to original settings
+    restart() {
+        this.setState({
+            grid: this.buildGrid(),
+            numFlipped: 0,
+            viewed: {},
+            currentCards: [],
+            score: 0,
+            clicks: 0
+        });
     }
 
     render() {
         let rows = _.map(this.state.grid, (row, ii) => {
             return <RowItem row={row} index={ii} key={ii} flipCard={this.flipCard.bind(this)}/>;
         });
-        let currentCards = _.map(this.state.currentCards, (card, ii) => {
-            return <span key={ii}>{card.value}</span>;
-        });
+
+        let score = this.state.score;
+        let clicks = this.state.clicks;
+
+        let restartButton = <RestartButton restart={this.restart.bind(this)}/>;
         return <div id="grid">
-            Current cards: {currentCards}
+            <div className="row">
+                <div className="column">
+                    <p>
+                        Score: {score}<br/>
+                        Clicks: {clicks}
+                    </p>
+                </div>
+                <div className="column">
+                    <p>
+                        {restartButton}
+                    </p>
+                </div>
+            </div>
             {rows}
         </div>;
     }
@@ -146,4 +196,8 @@ function CardItem(props) {
     } else {
         return <div className="column card removed"></div>;
     }
+}
+
+function RestartButton(props) {
+    return <button onClick={props.restart}>Restart</button>;
 }
