@@ -9,13 +9,18 @@ export default function game_init(root) {
 class Memory extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
+        this.state = this.buildInitState();
+    }
+
+    //build initial state of application
+    buildInitState() {
+        return {
             grid: this.buildGrid(),
             numFlipped: 0,
             currentCards: [],
             score: 0,
             clicks: 0
-        };
+        }
     }
 
     //generate a list of memory card values in random order
@@ -64,12 +69,12 @@ class Memory extends React.Component {
 
             let numFlipped = this.state.numFlipped + 1;
 
-            this.setState({
+            this.setState(_.assign({}, this.state, {
                 grid: newGrid,
                 numFlipped: numFlipped,
                 currentCards: currentCards,
                 clicks: this.state.clicks + 1
-            });
+            }));
 
             if (numFlipped === 2) {
                 setTimeout(() => {
@@ -100,12 +105,12 @@ class Memory extends React.Component {
             }
         }
 
-        this.setState({
+        this.setState(_.assign({}, this.state, {
             grid: newGrid,
             numFlipped: 0,
             currentCards: [],
             score: this.updateScore(matchFound),
-        });
+        }));
     }
 
     //generate new score based on current board
@@ -123,13 +128,7 @@ class Memory extends React.Component {
 
     //restart game, resetting state to original settings
     restart() {
-        this.setState({
-            grid: this.buildGrid(),
-            numFlipped: 0,
-            currentCards: [],
-            score: 0,
-            clicks: 0
-        });
+        this.setState(_.assign({}, this.state, this.buildInitState()));
     }
 
     render() {
