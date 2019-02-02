@@ -4,4 +4,8 @@ defmodule MemoryWeb.PageController do
   def index(conn, _params) do
     render conn, "index.html"
   end
+
+  def memory(conn, %{"name" => name}) do
+    render conn, "memory.html", name: name
+  end
 end
