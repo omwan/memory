@@ -28,9 +28,16 @@ class Memory extends React.Component {
 
     got_view(view) {
         console.log("new view", view);
-        let grid = this.build_rows(view.game.board);
-        this.setState(_.assign({}, this.state, {grid: grid}));
-        // this.setState(view.game);
+        let game = view.game;
+        let grid = this.build_rows(game.board);
+        let newState = {
+            grid: grid,
+            numFlipped: game.num_flipped,
+            currentCards: game.current_cards,
+            score: game.score,
+            clicks: game.clicks
+        };
+        this.setState(_.assign({}, this.state, newState));
     }
 
     build_rows(board) {
@@ -45,11 +52,15 @@ class Memory extends React.Component {
         return rows;
     }
 
+    flip_card(index) {
+        this.channel.push("guess", {row: index[0], col: index[1]})
+            .receive("ok", this.got_view.bind(this));
+    }
+
     render() {
         let rows = _.map(this.state.grid, (row, ii) => {
-            return <RowItem row={row} index={ii} key={ii}/>;
+            return <RowItem row={row} index={ii} key={ii} flipCard={this.flip_card.bind(this)}/>;
         });
-        // console.log(rows);
         return <div>
             {rows}
         </div>;
@@ -59,9 +70,8 @@ class Memory extends React.Component {
 function RowItem(props) {
     let row = props.row;
     let cards = _.map(row, (card, jj) => {
-        // let index = [props.index, jj];
-        // return <CardItem card={card} key={jj} index={index}/>
-        return <CardItem key={jj} card={card}></CardItem>
+        let index = [props.index, jj];
+        return <CardItem card={card} key={jj} flipCard={props.flipCard} index={index}/>
     });
     return <div className="row">
         {cards}
@@ -78,7 +88,9 @@ function CardItem(props) {
     }
 
     if (!card.removed) {
-        return <div className="column card">
+        return <div className="column card" onClick={() => {
+            props.flipCard(props.index)
+        }}>
             {display}
         </div>;
     } else {
