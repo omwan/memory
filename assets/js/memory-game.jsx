@@ -37,7 +37,15 @@ class Memory extends React.Component {
             score: game.score,
             clicks: game.clicks
         };
+
         this.setState(_.assign({}, this.state, newState));
+        if (game.num_flipped === 2) {
+            setTimeout(() => {
+                console.log("reset state");
+                this.channel.push("reset", {})
+                    .receive("ok", this.got_view.bind(this))
+            }, 1000);
+        }
     }
 
     build_rows(board) {
@@ -53,7 +61,17 @@ class Memory extends React.Component {
     }
 
     flip_card(index) {
-        this.channel.push("guess", {row: index[0], col: index[1]})
+        let row = index[0];
+        let col = index[1];
+        let card = this.state.grid[row][col];
+        if (this.state.numFlipped < 2 && !card.flipped && !card.removed) {
+            this.channel.push("guess", {row: index[0], col: index[1]})
+                .receive("ok", this.got_view.bind(this));
+        }
+    }
+
+    restart() {
+        this.channel.push("restart", {})
             .receive("ok", this.got_view.bind(this));
     }
 
@@ -61,7 +79,26 @@ class Memory extends React.Component {
         let rows = _.map(this.state.grid, (row, ii) => {
             return <RowItem row={row} index={ii} key={ii} flipCard={this.flip_card.bind(this)}/>;
         });
-        return <div>
+
+        let restartButton =  <RestartButton restart={this.restart.bind(this)}/>;
+
+        let score = this.state.score;
+        let clicks = this.state.clicks;
+
+        return <div id="grid">
+            <div className="row">
+                <div className="column">
+                    <p>
+                        Score: {score}<br/>
+                        Clicks: {clicks}
+                    </p>
+                </div>
+                <div className="column">
+                    <p>
+                        {restartButton}
+                    </p>
+                </div>
+            </div>
             {rows}
         </div>;
     }
@@ -96,4 +133,8 @@ function CardItem(props) {
     } else {
         return <div className="column card removed"></div>;
     }
+}
+
+function RestartButton(props) {
+    return <button onClick={props.restart}>Restart</button>;
 }
