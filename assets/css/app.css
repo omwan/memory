@@ -19,3 +19,7 @@
 .removed {
     background: none;
 }
+
+input {
+    font-size:15px;
+}
