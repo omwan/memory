@@ -27,7 +27,6 @@ class Memory extends React.Component {
     }
 
     got_view(view) {
-        console.log("new view", view);
         let game = view.game;
         let grid = this.build_rows(game.board);
         let newState = {
@@ -41,7 +40,6 @@ class Memory extends React.Component {
         this.setState(_.assign({}, this.state, newState));
         if (game.num_flipped === 2) {
             setTimeout(() => {
-                console.log("reset state");
                 this.channel.push("reset", {})
                     .receive("ok", this.got_view.bind(this))
             }, 1000);
@@ -49,15 +47,7 @@ class Memory extends React.Component {
     }
 
     build_rows(board) {
-        let rows = [];
-        for (let i = 0; i < 4; i++) {
-            let row = [];
-            for (let j = 0; j < 4; j++) {
-                row.push(board[i * 4 + j]);
-            }
-            rows.push(row);
-        }
-        return rows;
+        return _.chunk(board, 4);
     }
 
     flip_card(index) {

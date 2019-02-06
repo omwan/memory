@@ -57,7 +57,6 @@ defmodule Memory.Game do
       board: board,
       num_flipped: game.num_flipped + 1,
       current_cards: [Enum.at(game.board, index) | game.current_cards],
-      score: game.score,
       clicks: game.clicks + 1
     }
   end
