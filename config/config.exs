@@ -5,10 +5,17 @@
 # is restricted to this project.
 use Mix.Config
 
+path = Path.expand("~/.config/memory.secret")
+unless File.exists?(path) do
+  secret = Base.encode16(:crypto.strong_rand_bytes(32))
+  File.write!(path, secret)
+end
+secret = File.read!(path)
+
 # Configures the endpoint
 config :memory, MemoryWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "3tCdo/km2wQIFrGejdqPGn5R76pJSeSpToj4wj7MofASTRPjxx0ud8/y4i5K8si4",
+  secret_key_base: secret,
   render_errors: [view: MemoryWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Memory.PubSub,
            adapter: Phoenix.PubSub.PG2]
